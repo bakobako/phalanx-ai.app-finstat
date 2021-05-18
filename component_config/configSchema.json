@@ -1,16 +1,10 @@
 {
   "type": "object",
   "title": "Parameters",
-  "required": [
-    "#api_key",
-    "#private_key",
-    "request_type"
-  ],
   "properties": {
-    "#api_key": {
+    "api_key": {
       "type": "string",
       "title": "API Key",
-      "format": "password",
       "default": "",
       "description": "API Key provided with your finstat account",
       "minLength": 1,
@@ -27,11 +21,24 @@
     },
     "request_type": {
       "type": "string",
+      "enum": [
+        "detail",
+        "extended"
+      ],
       "title": "API Request type",
       "description": "Type of request, limited by your finstat account type. Options are : detail, extended, ultimate. Check Finstat documentation for more information",
-      "default": "",
+      "default": "detail",
       "minLength": 1,
       "propertyOrder": 3
+    },
+     "ico_field": {
+      "type": "string",
+      "title": "ICO field",
+      "default": "",
+      "description": "Name of field in the input file which contains the ICO number",
+      "minLength": 1,
+      "propertyOrder": 4
     }
+
   }
 }

@@ -4,6 +4,7 @@ import requests
 import hashlib
 import xmltodict
 from enum import Enum
+from retry import retry
 
 FINSTAT_URL = "https://finstat.sk/api/"
 
@@ -12,18 +13,18 @@ class FinstatClient:
     class RequestType(Enum):
         DETAIL = "detail"
         EXTENDED = "extended"
-        ULTIMATE = "ultimate"
 
     def __init__(self, api_key, private_key, request_type):
         self.api_key = api_key
         self.private_key = private_key
         self.request_type = request_type
 
+    @retry(tries=2, delay=2)
     def get_ico_data(self, ico):
         logging.info(f"Getting Finstat data for ico : {ico}")
         hash_key = self.get_hash_key(ico)
         params = self.construct_http_params(ico, hash_key)
-        response, response_text = self.get_json_response(params, FINSTAT_URL, self.request_type)
+        response = self.get_json_response(params, FINSTAT_URL, self.request_type)
 
         return response
 
@@ -84,7 +85,7 @@ class FinstatClient:
             # If successful return the result
             response_key = request_type.capitalize() + "Result"
             json_response = dict(xmltodict.parse(response.text)[response_key])
-            return json_response, response.text
+            return json_response
         else:
             logging.info(f"Error : ico {params['ico']} is not a valid ico in the Finstat database")
-            return False, response.text
+            return False
